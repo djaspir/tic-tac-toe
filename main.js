@@ -1,92 +1,63 @@
-//player factory function
-// const Player = (() => {})
-// function Player(symbol, isTurn) {
-//   return {
-//     symbol,
-//     isTurn,
-//   };
-// }
-
-// const gameController = () => {
-//   const player1 = new Player("X", true);
-//   const player2 = new Player("O", false);
-
-//   console.log(player1);
-// };
-
-// Player Factory Function
-// const Player = (mark, isTurn) => {
-//   return {
-//     mark,
-//     isTurn,
-//   };
-// };
-// GameBoard Object with gameboard as an array
 const gameBoard = (() => {
   const gameBoard = ["", "", "", "", "", "", "", "", ""];
-
-  const getBoard = (index) => {
-    return gameBoard[index];
-  };
-
-  const setBoard = (mark, index) => {
-    return (gameBoard[index] = mark);
-  };
-
-  return {
-    getBoard,
-    setBoard,
-  };
-})();
-
-const displayController = (() => {
-  let isTurn = true;
+  const winCombinations = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  let turn = 1;
+  let isEnded = false;
 
   // Cache DOM
   const cell = document.querySelectorAll(".cell");
   const gameText = document.getElementById("gameText");
 
-  const render = () => {
-    // Board
-    for (let i = 0; i < cell.length; i++) {
-      cell[i].textContent = gameBoard.getBoard(i);
-    }
-  };
-
-  // render
-
-  const addMark = (mark, index) => {
-    gameBoard.setBoard(mark, index);
-  };
-
-  const switchTurn = () => (isTurn = !isTurn);
-
-  const handleClick = (e) => {
-    const index = e.target.dataset.id;
-    const mark = isTurn ? "X" : "O";
-
-    // Place Mark
-    addMark(mark, index);
-    switchTurn();
-    render();
-
-    // Check for win
-    // Check for draw
-    // Switch Turns
-  };
-
   // Bind Events
   cell.forEach((item) => {
-    item.addEventListener("click", handleClick, { once: true });
+    item.addEventListener("click", addMark);
   });
+
+  render(getMark());
+
+  function addMark(e) {
+    if (isEnded) return;
+    const index = e.target.dataset.id;
+
+    if (cell[index].textContent !== "") return;
+    gameBoard[index] = getMark();
+
+    if (checkWin()) {
+      isEnded = true;
+      render(getMark());
+      return (gameText.textContent = `Player ${getMark()} Win.`);
+    }
+
+    render(getMark());
+    turn++;
+  }
+
+  function getMark() {
+    return turn % 2 !== 0 ? "X" : "O";
+  }
+
+  function checkWin() {
+    return winCombinations.some((combination) => {
+      return combination.every((index) => {
+        return gameBoard[index] === getMark();
+      });
+    });
+  }
+
+  function render(mark) {
+    gameText.textContent = `Player ${mark}'s Turn`;
+
+    for (let i = 0; i < gameBoard.length; i++) {
+      cell[i].textContent = gameBoard[i];
+    }
+  }
 })();
-
-// Players are also going to be stored in objects
-
-// Also an object to control the flow of the game itself
-
-// MAIN GOAL: is to have as little global code as possible
-
-// Players = factory
-
-// gamebBoard, displayController = module
