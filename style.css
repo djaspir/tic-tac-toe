@@ -67,6 +67,6 @@ footer {
 .reset-btn {
   padding: 12px 24px;
   font-size: 1.05rem;
-  display: none;
+  display: block;
   margin: 40px auto;
 }
